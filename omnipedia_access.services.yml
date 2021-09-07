@@ -1,0 +1,7 @@
+services:
+
+  # Event subscriber to fix Permissions by Entity caching bypassing access.
+  omnipedia_access.entity_permissions_by_entity_access_cache_event_subscriber:
+    class: Drupal\omnipedia_access\EventSubscriber\Entity\PermissionsByEntityAccessCacheEventSubscriber
+    tags:
+      - { name: 'event_subscriber' }
