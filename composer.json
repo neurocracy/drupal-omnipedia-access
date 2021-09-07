@@ -1,0 +1,27 @@
+{
+  "name": "drupal/omnipedia_access",
+  "description": "Omnipedia - Access",
+  "type": "project",
+  "license": "GPL-2.0-or-later",
+  "authors": [
+    {
+      "name": "Ambient.Impact",
+      "homepage": "https://ambientimpact.com/",
+      "role": "Developer"
+    }
+  ],
+  "require": {
+    "drupal/hook_event_dispatcher": "^2.0",
+    "drupal/permissions_by_term": "^2.34"
+  },
+  "require-dev": {
+  },
+  "extra": {
+    "patches": {
+      "drupal/permissions_by_term": {
+        "Respect the Require all terms granted and Permission mode settings in Permission by entity module: https://www.drupal.org/project/permissions_by_term/issues/3072171 ": "https://git.drupalcode.org/project/permissions_by_term/-/merge_requests/8.patch",
+        "Permissions by Entity PHP notice for Commerce Product entities: https://www.drupal.org/project/permissions_by_term/issues/3231188 ": "https://git.drupalcode.org/project/permissions_by_term/-/merge_requests/9.patch"
+      }
+    }
+  }
+}
