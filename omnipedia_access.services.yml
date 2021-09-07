@@ -1,5 +1,14 @@
 services:
 
+  # The Omnipedia Permissions by Term helper service.
+  omnipedia_access.permissions_by_term:
+    class: Drupal\omnipedia_access\Service\PermissionsByTerm
+    arguments:
+      - '@config.factory'
+      - '@entity_type.manager'
+      - '@permissions_by_term.access_storage'
+      - '@permissions_by_term.node_access'
+
   # Event subscriber to fix Permissions by Entity caching bypassing access.
   omnipedia_access.entity_permissions_by_entity_access_cache_event_subscriber:
     class: Drupal\omnipedia_access\EventSubscriber\Entity\PermissionsByEntityAccessCacheEventSubscriber
