@@ -5,23 +5,37 @@ namespace Drupal\omnipedia_access\EventSubscriber\Entity;
 use Drupal\Core\Entity\FieldableEntityInterface;
 use Drupal\core_event_dispatcher\Event\Entity\EntityViewAlterEvent;
 use Drupal\hook_event_dispatcher\HookEventDispatcherInterface;
+use Drupal\permissions_by_entity\Service\AccessCheckerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
  * Event subscriber to fix Permissions by Entity caching bypassing access.
  *
+ * This works by adding the 'permissions_by_term:access_result_cache' cache tag
+ * to the entity's build/render array if it's a fieldable entity that's using
+ * term-based access control.
+ *
  * @see https://www.drupal.org/project/permissions_by_term/issues/3222563
  *   Permissions by Term/Entity issue describing the bug and potential fixes.
- *
- * @todo Can we generalize this so it checks for any taxonomy term field that's
- *   controlled by Permissions by Term so we avoid hard coding a field name?
  */
 class PermissionsByEntityAccessCacheEventSubscriber implements EventSubscriberInterface {
 
   /**
-   * The episode tiers field name to check for.
+   * The Permissions by Entity access checker service.
+   *
+   * @var \Drupal\permissions_by_entity\Service\AccessCheckerInterface
    */
-  protected const FIELD_NAME = 'field_episode_tier';
+  protected $accessChecker;
+
+  /**
+   * Event subscriber constructor; saves dependencies.
+   *
+   * @param \Drupal\permissions_by_entity\Service\AccessCheckerInterface $accessChecker
+   *   The Permissions by Entity access checker service.
+   */
+  public function __construct(AccessCheckerInterface $accessChecker) {
+    $this->accessChecker = $accessChecker;
+  }
 
   /**
    * {@inheritdoc}
@@ -43,11 +57,11 @@ class PermissionsByEntityAccessCacheEventSubscriber implements EventSubscriberIn
     /** @var \Drupal\Core\Entity\EntityInterface */
     $entity = $event->getEntity();
 
-    // Bail if this entity isn't a fieldable entity or it doesn't have the
-    // episode tiers field.
+    // Bail if this entity isn't a fieldable entity or it isn't using term-based
+    // access control.
     if (
       !($entity instanceof FieldableEntityInterface) ||
-      !$entity->hasField(self::FIELD_NAME)
+      !$this->accessChecker->isAccessControlled($entity)
     ) {
       return;
     }
