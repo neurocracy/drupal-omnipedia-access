@@ -5,3 +5,12 @@ services:
     class: Drupal\omnipedia_access\EventSubscriber\Entity\PermissionsByEntityAccessCacheEventSubscriber
     tags:
       - { name: 'event_subscriber' }
+
+  # Event subscriber to fix Permissions by Entity bypassing other access checks.
+  omnipedia_access.entity_permissions_by_entity_access_check_event_subscriber:
+    class: Drupal\omnipedia_access\EventSubscriber\Entity\PermissionsByEntityAccessCheckEventSubscriber
+    arguments:
+      - '@permissions_by_entity.access_checker'
+      - '@permissions_by_term.access_result_cache'
+    tags:
+      - { name: 'event_subscriber' }
