@@ -136,7 +136,7 @@ class PermissionsByTerm implements PermissionsByTermInterface {
       // check against the post-purchase permissions.
       !empty(\array_diff($updatedPermissions, $previousPermissions))
     ) {
-      $this->rebuildNodeAccess($uid);
+      $this->rebuildNodeAccess();
     }
 
   }
@@ -144,13 +144,13 @@ class PermissionsByTerm implements PermissionsByTermInterface {
   /**
    * {@inheritdoc}
    */
-  public function rebuildNodeAccess(string $uid): void {
+  public function rebuildNodeAccess(): void {
 
     if ($this->disabledNodeAccessRecords === true) {
       return;
     }
 
-    $this->nodeAccess->rebuildAccess($uid);
+    $this->nodeAccess->rebuildAccess();
 
   }
 

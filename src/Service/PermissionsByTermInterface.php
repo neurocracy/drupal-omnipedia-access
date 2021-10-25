@@ -46,14 +46,8 @@ interface PermissionsByTermInterface {
   ): void;
 
   /**
-   * Rebuild node access records for a provided user.
-   *
-   * This should only be called if $rebuild was passed as false to
-   * addUserTerms().
-   *
-   * @param string $uid
-   *   A user ID.
+   * Rebuild node access records.
    */
-  public function rebuildNodeAccess(string $uid): void;
+  public function rebuildNodeAccess(): void;
 
 }
