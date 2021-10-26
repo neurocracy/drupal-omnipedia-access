@@ -5,7 +5,9 @@ services:
     class: Drupal\omnipedia_access\Service\PermissionsByTerm
     arguments:
       - '@config.factory'
+      - '@database'
       - '@entity_type.manager'
+      - '@node.grant_storage'
       - '@permissions_by_term.access_storage'
       - '@permissions_by_term.node_access'
 

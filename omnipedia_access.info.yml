@@ -5,6 +5,7 @@ package: Omnipedia
 core_version_requirement: ^8 || ^9
 
 dependencies:
+  - drupal:node
   - hook_event_dispatcher:core_event_dispatcher
   - permissions_by_term:permissions_by_term
   - permissions_by_term:permissions_by_entity

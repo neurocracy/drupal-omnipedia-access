@@ -50,4 +50,16 @@ interface PermissionsByTermInterface {
    */
   public function rebuildNodeAccess(): void;
 
+  /**
+   * Rebuild access records for the specified node ID (nid);
+   *
+   * @param string $nid
+   *   The node ID to rebuild access records for.
+   *
+   * @return bool
+   *   True if access records were rebuilt, and false if the if they weren't
+   *   due to not being able to load the node.
+   */
+  public function rebuildAccessForNode(string $nid): bool;
+
 }

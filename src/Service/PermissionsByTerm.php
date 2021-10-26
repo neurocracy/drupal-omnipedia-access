@@ -5,8 +5,10 @@ namespace Drupal\omnipedia_access\Service;
 use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Access\AccessResultInterface;
 use Drupal\Core\Config\ConfigFactoryInterface;
+use Drupal\Core\Database\Connection;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Session\AccountInterface;
+use Drupal\node\NodeGrantDatabaseStorageInterface;
 use Drupal\omnipedia_access\Service\PermissionsByTermInterface;
 use Drupal\permissions_by_term\Service\AccessStorage;
 use Drupal\permissions_by_term\Service\NodeAccess;
@@ -35,11 +37,39 @@ class PermissionsByTerm implements PermissionsByTermInterface {
   protected $accessStorage;
 
   /**
+   * The Drupal database connection.
+   *
+   * @var \Drupal\Core\Database\Connection
+   */
+  protected $database;
+
+  /**
    * The Permissions by Term module node access service.
    *
    * @var \Drupal\permissions_by_term\Service\NodeAccess
    */
   protected $nodeAccess;
+
+  /**
+   * The Drupal node access control handler.
+   *
+   * @var \Drupal\node\NodeAccessControlHandlerInterface
+   */
+  protected $nodeAccessControlHandler;
+
+  /**
+   * The Drupal node access grant storage.
+   *
+   * @var \Drupal\node\NodeGrantDatabaseStorageInterface
+   */
+  protected $nodeGrantStorage;
+
+  /**
+   * The Drupal node entity storage.
+   *
+   * @var \Drupal\node\NodeStorageInterface
+   */
+  protected $nodeStorage;
 
   /**
    * The Drupal user entity storage.
@@ -54,8 +84,14 @@ class PermissionsByTerm implements PermissionsByTermInterface {
    * @param \Drupal\Core\Config\ConfigFactoryInterface $configFactory
    *   The Drupal configuration factory service.
    *
+   * @param \Drupal\Core\Database\Connection $database
+   *   The Drupal database connection.
+   *
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
    *   The Drupal entity type manager.
+   *
+   * @param \Drupal\node\NodeGrantDatabaseStorageInterface $nodeGrantStorage
+   *   The Drupal node access grant storage.
    *
    * @param \Drupal\permissions_by_term\Service\AccessStorage $accessStorage
    *   The Permissions by Term module access storage service.
@@ -65,12 +101,19 @@ class PermissionsByTerm implements PermissionsByTermInterface {
    */
   public function __construct(
     ConfigFactoryInterface      $configFactory,
+    Connection                  $database,
     EntityTypeManagerInterface  $entityTypeManager,
+    NodeGrantDatabaseStorageInterface $nodeGrantStorage,
     AccessStorage               $accessStorage,
     NodeAccess                  $nodeAccess
   ) {
     $this->accessStorage  = $accessStorage;
+    $this->database       = $database;
     $this->nodeAccess     = $nodeAccess;
+    $this->nodeAccessControlHandler = $entityTypeManager
+      ->getAccessControlHandler('node');
+    $this->nodeGrantStorage = $nodeGrantStorage;
+    $this->nodeStorage    = $entityTypeManager->getStorage('node');
     $this->userStorage    = $entityTypeManager->getStorage('user');
 
     $this->disabledNodeAccessRecords = $configFactory
@@ -151,6 +194,41 @@ class PermissionsByTerm implements PermissionsByTermInterface {
     }
 
     $this->nodeAccess->rebuildAccess();
+
+  }
+
+  /**
+   * {@inheritdoc}
+   *
+   * @see \Drupal\permissions_by_term\Service\NodeAccess::rebuildNodeAccessOne()
+   *   Adapted from this as non-static and to use injected services.
+   */
+  public function rebuildAccessForNode(string $nid): bool {
+
+    // Delete any existing grants for this node.
+    $this->database
+      ->delete('node_access')
+      ->condition('nid', $nid)
+      ->execute();
+
+    $this->nodeStorage->resetCache([$nid]);
+
+    /** @var \Drupal\omnipedia_core\Entity\NodeInterface|null */
+    $node = $this->nodeStorage->load($nid);
+
+    if (!\is_object($node)) {
+      return false;
+    }
+
+    // To preserve database integrity, only write grants if the node loads
+    // successfully.
+
+    /** @var array */
+    $grants = $this->nodeAccessControlHandler->acquireGrants($node);
+
+    $this->nodeGrantStorage->write($node, $grants);
+
+    return true;
 
   }
 
