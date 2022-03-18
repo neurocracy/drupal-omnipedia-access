@@ -30,14 +30,8 @@ class RebuildNodeAccess extends ActionBase implements ContainerFactoryPluginInte
   /**
    * {@inheritdoc}
    *
-   * @param \Drupal\Core\Session\AccountInterface $currentUser
-   *   The current user.
-   *
    * @param \Drupal\omnipedia_access\Service\PermissionsByTermInterface $permissionsByTerm
    *   The Omnipedia Permissions by Term helper service.
-   *
-   * @param \Drupal\Core\TempStore\PrivateTempStoreFactory $tempStoreFactory
-   *   The Drupal tempstore factory.
    */
   public function __construct(
     array $configuration, $pluginId, $pluginDefinition,
