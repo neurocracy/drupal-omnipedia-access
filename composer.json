@@ -19,9 +19,9 @@
   "extra": {
     "patches": {
       "drupal/permissions_by_term": {
-        "Respect the Require all terms granted and Permission mode settings in Permission by entity module: https://www.drupal.org/project/permissions_by_term/issues/3072171 ": "https://git.drupalcode.org/project/permissions_by_term/-/merge_requests/8.patch",
-        "Permissions by Entity PHP notice for Commerce Product entities: https://www.drupal.org/project/permissions_by_term/issues/3231188 ": "https://git.drupalcode.org/project/permissions_by_term/-/merge_requests/9.patch",
-        "PbE: Add entityTypeId to cache tags: https://www.drupal.org/project/permissions_by_term/issues/3238759 ": "https://www.drupal.org/files/issues/2021-09-24/3238759-PbE_respect_entity_type_id-4.patch"
+        "Respect the Require all terms granted and Permission mode settings in Permission by entity module: https://www.drupal.org/project/permissions_by_term/issues/3072171#comment-14209554": "drupal/modules/omnipedia/omnipedia_access/patches/drupal/permissions_by_term/merge-request-8-respect-require-all-terms-permission-by-entity.patch",
+        "Permissions by Entity PHP notice for Commerce Product entities: https://www.drupal.org/project/permissions_by_term/issues/3231188#comment-14209558": "drupal/modules/omnipedia/omnipedia_access/patches/drupal/permissions_by_term/merge-request-9-commerce-product-notices.patch",
+        "PbE: Add entityTypeId to cache tags: https://www.drupal.org/project/permissions_by_term/issues/3238759#comment-14234566": "drupal/modules/omnipedia/omnipedia_access/patches/drupal/permissions_by_term/3238759-PbE_respect_entity_type_id-4.patch"
       }
     }
   }

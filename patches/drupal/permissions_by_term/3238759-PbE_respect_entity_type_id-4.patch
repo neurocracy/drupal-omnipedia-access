@@ -1,0 +1,168 @@
+diff --git a/modules/permissions_by_entity/permissions_by_entity.module b/modules/permissions_by_entity/permissions_by_entity.module
+index 451f255..67cd92b 100644
+--- a/modules/permissions_by_entity/permissions_by_entity.module
++++ b/modules/permissions_by_entity/permissions_by_entity.module
+@@ -17,24 +17,25 @@ function permissions_by_entity_entity_access(EntityInterface $entity, $operation
+   /**
+    * @var \Drupal\permissions_by_term\Cache\AccessResultCache $cache
+    */
+-  $cache = \Drupal::service('permissions_by_term.access_result_cache');
++  $cache = \Drupal::service('permissions_by_entity.access_result_cache');
+ 
+   $accessResult = AccessResult::neutral();
+ 
+   /** @var \Drupal\permissions_by_entity\Service\AccessChecker $accessChecker */
+   if ($operation === 'view' && $entity instanceof FieldableEntityInterface && !$entity->isNew()) {
+-    if ($cache->hasAccessResultsCache($account->id(), $entity->id())) {
+-      return $cache->getAccessResultsCache($account->id(), $entity->id());
+-    }
+-
+     $accessChecker = \Drupal::service('permissions_by_entity.access_checker');
+     // Check if the entity is even using term based access control.
+     if ($accessChecker->isAccessControlled($entity)) {
++
++      if ($cache->hasAccessResultsCache($account->id(), $entity)) {
++        return $cache->getAccessResultsCache($account->id(), $entity);
++      }
++
+       // Do not just return a neutral result if access allowed by the module.
+       $accessResult = $accessChecker->isAccessAllowed($entity, $account->id()) ? AccessResult::allowed() : AccessResult::forbidden('Access revoked by permissions_by_entity module.');
+-    }
+ 
+-    $cache->setAccessResultsCache($account->id(), $entity->id(), $accessResult);
++      $cache->setAccessResultsCache($account->id(), $entity, $accessResult);
++    }
+   }
+ 
+   return $accessResult;
+diff --git a/modules/permissions_by_entity/permissions_by_entity.services.yml b/modules/permissions_by_entity/permissions_by_entity.services.yml
+index ef32285..6b22f03 100644
+--- a/modules/permissions_by_entity/permissions_by_entity.services.yml
++++ b/modules/permissions_by_entity/permissions_by_entity.services.yml
+@@ -10,6 +10,11 @@ services:
+       - '@entity_field.manager'
+       - '@database'
+ 
++  permissions_by_entity.access_result_cache:
++    class: Drupal\permissions_by_entity\Cache\AccessResultCache
++    arguments: ['@cache.permissions_by_term']
++
++
+   permissions_by_entity.kernel_event_subscriber:
+     class: Drupal\permissions_by_entity\EventSubscriber\PermissionsByEntityKernelEventSubscriber
+     arguments:
+diff --git a/modules/permissions_by_entity/src/Cache/AccessResultCache.php b/modules/permissions_by_entity/src/Cache/AccessResultCache.php
+new file mode 100644
+index 0000000..62a21f8
+--- /dev/null
++++ b/modules/permissions_by_entity/src/Cache/AccessResultCache.php
+@@ -0,0 +1,93 @@
++<?php
++
++namespace Drupal\permissions_by_entity\Cache;
++
++use Drupal\Core\Access\AccessResult;
++use Drupal\Core\Cache\Cache;
++use Drupal\Core\Cache\CacheBackendInterface;
++use Drupal\Core\Entity\EntityInterface;
++
++
++class AccessResultCache {
++
++  /**
++   * The default cache bin.
++   *
++   * @var \Drupal\Core\Cache\CacheBackendInterface
++   */
++  protected $cache;
++
++  public function __construct(CacheBackendInterface $cache) {
++    $this->cache = $cache;
++  }
++
++  public function setAccessResultsCache(int $accountId, EntityInterface $entity, AccessResult $accessResult): void {
++    $data = \serialize($accessResult);
++    $cid = 'permissions_by_entity:access_result_cache:' . $entity->getEntityTypeId() . ':' . $entity->id() . ':' . $accountId;
++
++    $tags = [
++      'permissions_by_entity:access_result_cache:' . $entity->getEntityTypeId() . ':' . $entity->id() . ':' . $accountId,
++      'permissions_by_entity:access_result_cache:' . $entity->getEntityTypeId() . ':'. $entity->id(),
++      'permissions_by_entity:access_result_cache:' . $entity->getEntityTypeId(),
++      'permissions_by_entity:access_result_cache',
++    ];
++
++    $tags = Cache::mergeTags($tags, [$cid]);
++
++    $this->cache->set($cid, $data, Cache::PERMANENT, $tags);
++
++    $staticCache = &drupal_static(__FUNCTION__ . $cid, NULL);
++    $staticCache = $data;
++  }
++
++  public function getAccessResultsCache(int $accountId, EntityInterface $entity): AccessResult {
++    $cid = 'permissions_by_entity:access_result_cache:' . $entity->getEntityTypeId() . ':' . $entity->id() . ':' . $accountId;
++
++    $staticCache = &drupal_static(__FUNCTION__ . $cid, NULL);
++
++    if ($staticCache) {
++      return \unserialize($staticCache);
++    }
++
++    $result = $this->cache->get($cid);
++
++    $data = \unserialize($result->data);
++
++    if (!$data instanceof AccessResult) {
++      throw new \Exception("Unexpected result from cache. Passed accountId: $accountId - passed entity: $entity->getEntityTypeId()/$entity->id()");
++    }
++
++    return $data;
++  }
++
++  public function hasAccessResultsCache(int $accountId, EntityInterface $entity): bool {
++    $cid = 'permissions_by_entity:access_result_cache:' . $entity->getEntityTypeId() . ':' . $entity->id() . ':' . $accountId;
++
++    $staticCache = &drupal_static(__FUNCTION__ . $cid, NULL);
++
++    if ($staticCache) {
++      $data = \unserialize($staticCache);
++
++      if (!$data instanceof AccessResult) {
++        return FALSE;
++      }
++
++      return TRUE;
++    }
++
++    $result = $this->cache->get($cid);
++
++    if (!isset($result->data)) {
++      return FALSE;
++    }
++
++    $data = \unserialize($result->data);
++
++    if (!$data instanceof AccessResult) {
++      return FALSE;
++    }
++
++    return TRUE;
++  }
++
++}
+diff --git a/modules/permissions_by_entity/src/Service/AccessChecker.php b/modules/permissions_by_entity/src/Service/AccessChecker.php
+index 021d1f3..2108690 100644
+--- a/modules/permissions_by_entity/src/Service/AccessChecker.php
++++ b/modules/permissions_by_entity/src/Service/AccessChecker.php
+@@ -160,6 +160,11 @@ class AccessChecker extends AccessCheck implements AccessCheckerInterface {
+       $this->checkedEntityCache->clear();
+     }
+ 
++    if ($entity->getEntityTypeId() == 'node') {
++      // Make sure to leave nodes to the permissions_by_term module.
++      return FALSE;
++    }
++
+     // Iterate over the fields the entity contains.
+     foreach ($entity->getFields() as $field) {
+       // We only need to check for entity reference fields
