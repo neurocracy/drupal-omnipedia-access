@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Drupal\omnipedia_access\Controller;
 
+use Drupal\Core\Cache\CacheableResponse;
 use Drupal\Core\Controller\ControllerBase;
+use Drupal\Core\Link;
 use Drupal\Core\Session\AccountProxyInterface;
-use Drupal\Core\Url;
-use Drupal\Core\Utility\LinkGeneratorInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -16,36 +16,13 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class Http4xxController extends ControllerBase {
 
   /**
-   * The current user proxy service.
-   *
-   * @var \Drupal\Core\Session\AccountProxyInterface
-   */
-  protected AccountProxyInterface $currentUser;
-
-  /**
-   * The Drupal link generator service.
-   *
-   * @var \Drupal\Core\Utility\LinkGeneratorInterface
-   */
-  protected LinkGeneratorInterface $linkGenerator;
-
-  /**
    * Controller constructor; saves dependencies.
    *
    * @param \Drupal\Core\Session\AccountProxyInterface $currentUser
    *   The current user proxy service.
-   *
-   * @param \Drupal\Core\Utility\LinkGeneratorInterface $linkGenerator
-   *   The Drupal link generator service.
    */
-  public function __construct(
-    AccountProxyInterface   $currentUser,
-    LinkGeneratorInterface  $linkGenerator
-  ) {
-
-    $this->currentUser    = $currentUser;
-    $this->linkGenerator  = $linkGenerator;
-
+  public function __construct(AccountProxyInterface $currentUser) {
+    $this->currentUser = $currentUser;
   }
 
   /**
@@ -53,8 +30,7 @@ class Http4xxController extends ControllerBase {
    */
   public static function create(ContainerInterface $container) {
     return new static(
-      $container->get('current_user'),
-      $container->get('link_generator')
+      $container->get('current_user')
     );
   }
 
@@ -81,17 +57,28 @@ class Http4xxController extends ControllerBase {
     // If the user is anonymous, offer a log in link.
     if ($this->currentUser->isAnonymous()) {
 
-      return [
-        '#markup' => $this->t(
-          'You are not authorised to access this page. If you have an account, you can @login.',
-          [
-            '@login' => $this->linkGenerator->generate(
-              $this->t('log in'),
-              Url::fromRoute('user.login')
-            ),
-          ]
-        ),
-      ];
+      /** @var array Render array to be returned. */
+      $renderArray = [];
+
+      /** @var \Drupal\Core\Link */
+      $link = Link::createFromRoute(
+        $this->t('log in'),
+        'user.login'
+      );
+
+      /** @var \Drupal\Core\GeneratedLink The generated link object, containing the link and any related cache metadata. */
+      $generatedLink = $link->toString();
+
+      // Apply the generated link's cache metadata to our render array so that
+      // it's not lost when it's cast to a string.
+      $generatedLink->applyTo($renderArray);
+
+      $renderArray['#markup'] = $this->t(
+        'You are not authorised to access this page. If you have an account, you can @login.',
+        ['@login' => $generatedLink]
+      );
+
+      return $renderArray;
 
     }
 
