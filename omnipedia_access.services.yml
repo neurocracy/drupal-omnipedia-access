@@ -27,3 +27,9 @@ services:
       - '@permissions_by_term.access_result_cache'
     tags:
       - { name: 'event_subscriber' }
+
+  # Event subscriber to replace the 'system.403' route controller.
+  omnipedia_access.routing_alter_system_403_content_event_subscriber:
+    class: Drupal\omnipedia_access\EventSubscriber\Routing\ReplaceSystem403ControllerEventSubscriber
+    tags:
+      - { name: 'event_subscriber' }
