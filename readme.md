@@ -1,5 +1,6 @@
-This contains the source files for the "[Omnipedia](https://omnipedia.app/) -
-Access" Drupal module.
+This contains the source files for the "*Omnipedia - Access*" Drupal module,
+provides access and permission-related functionality for
+[Omnipedia](https://omnipedia.app/).
 
 ⚠️⚠️⚠️ ***Here be potential spoilers. Proceed at your own risk.*** ⚠️⚠️⚠️
 
