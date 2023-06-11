@@ -18,7 +18,7 @@ part of this codebase is useful or will inspire someone out there.
 
 # Requirements
 
-* [Drupal 9](https://www.drupal.org/download) ([Drupal 8 is end-of-life](https://www.drupal.org/psa-2021-11-30))
+* [Drupal 9.5 or 10](https://www.drupal.org/download) ([Drupal 8 is end-of-life](https://www.drupal.org/psa-2021-11-30))
 
 * [Composer](https://getcomposer.org/)
 
@@ -47,5 +47,17 @@ section:
 ```
 
 Then, in your project's root, run `composer require
-"drupal/omnipedia_access:3.x-dev@dev"` to have Composer install the module and
+"drupal/omnipedia_access:4.x-dev@dev"` to have Composer install the module and
 its required dependencies for you.
+
+-----------------
+
+# Breaking changes
+
+The following major version bumps indicate breaking changes:
+
+* 4.x:
+
+  * Requires Drupal 9.5 or [Drupal 10](https://www.drupal.org/project/drupal/releases/10.0.0) with compatibility and deprecation fixes for the latter.
+
+  * Increases minimum version of [Hook Event Dispatcher](https://www.drupal.org/project/hook_event_dispatcher) to 3.1, removes deprecated code, and adds support for 4.0 which supports Drupal 10.

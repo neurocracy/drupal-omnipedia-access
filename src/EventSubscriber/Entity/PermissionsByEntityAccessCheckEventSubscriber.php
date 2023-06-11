@@ -4,8 +4,8 @@ namespace Drupal\omnipedia_access\EventSubscriber\Entity;
 
 use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Entity\FieldableEntityInterface;
+use Drupal\core_event_dispatcher\EntityHookEvents;
 use Drupal\core_event_dispatcher\Event\Entity\EntityAccessEvent;
-use Drupal\hook_event_dispatcher\HookEventDispatcherInterface;
 use Drupal\permissions_by_entity\Service\AccessCheckerInterface;
 use Drupal\permissions_by_term\Cache\AccessResultCache;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -70,7 +70,7 @@ class PermissionsByEntityAccessCheckEventSubscriber implements EventSubscriberIn
    */
   public static function getSubscribedEvents() {
     return [
-      HookEventDispatcherInterface::ENTITY_ACCESS => 'onEntityAccess',
+      EntityHookEvents::ENTITY_ACCESS => 'onEntityAccess',
     ];
   }
 

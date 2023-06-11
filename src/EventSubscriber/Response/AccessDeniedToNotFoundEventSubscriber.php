@@ -6,7 +6,7 @@ namespace Drupal\omnipedia_access\EventSubscriber\Response;
 
 use Drupal\Core\EventSubscriber\HttpExceptionSubscriberBase;
 use Drupal\Core\Session\AccountProxyInterface;
-use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
+use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
@@ -48,14 +48,14 @@ class AccessDeniedToNotFoundEventSubscriber extends HttpExceptionSubscriberBase 
    * Additionally, by always returning a 404, this hides admin paths that may
    * leak the presence or lack thereof of a module or configuration.
    *
-   * @param \Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent $event
+   * @param \Symfony\Component\HttpKernel\Event\ExceptionEvent $event
    *   The event to process.
    */
-  public function on403(GetResponseForExceptionEvent $event): void {
+  public function on403(ExceptionEvent $event): void {
 
     if ($this->currentUser->hasPermission('bypass node access')) {
 
-      $event->setException(new AccessDeniedHttpException());
+      $event->setThrowable(new AccessDeniedHttpException());
 
       return;
 
@@ -71,7 +71,7 @@ class AccessDeniedToNotFoundEventSubscriber extends HttpExceptionSubscriberBase 
     // front page path is accessed (e.g. '/node/\d+' or the node's path alias);
     // i.e. it doesn't make a distinction between the actual paths.
     if ($request->getPathInfo() !== '/') {
-      $event->setException(new NotFoundHttpException());
+      $event->setThrowable(new NotFoundHttpException());
     }
 
   }

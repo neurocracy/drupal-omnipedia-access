@@ -3,8 +3,8 @@
 namespace Drupal\omnipedia_access\EventSubscriber\Entity;
 
 use Drupal\Core\Entity\FieldableEntityInterface;
+use Drupal\core_event_dispatcher\EntityHookEvents;
 use Drupal\core_event_dispatcher\Event\Entity\EntityViewAlterEvent;
-use Drupal\hook_event_dispatcher\HookEventDispatcherInterface;
 use Drupal\permissions_by_entity\Service\AccessCheckerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -42,7 +42,7 @@ class PermissionsByEntityAccessCacheEventSubscriber implements EventSubscriberIn
    */
   public static function getSubscribedEvents() {
     return [
-      HookEventDispatcherInterface::ENTITY_VIEW_ALTER => 'onEntityViewAlter',
+      EntityHookEvents::ENTITY_VIEW_ALTER => 'onEntityViewAlter',
     ];
   }
 
