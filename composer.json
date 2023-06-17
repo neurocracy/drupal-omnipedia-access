@@ -3,6 +3,10 @@
   "description": "Omnipedia - Access",
   "type": "drupal-custom-module",
   "license": "GPL-2.0-or-later",
+  "support": {
+    "docs": "https://github.com/neurocracy/drupal-omnipedia-access",
+    "source": "https://github.com/neurocracy/drupal-omnipedia-access"
+  },
   "authors": [
     {
       "name": "Ambient.Impact",
