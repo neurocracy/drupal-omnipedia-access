@@ -1,33 +1,5 @@
 services:
 
-  # The Omnipedia Permissions by Term helper service.
-  omnipedia_access.permissions_by_term:
-    class: Drupal\omnipedia_access\Service\PermissionsByTerm
-    arguments:
-      - '@config.factory'
-      - '@database'
-      - '@entity_type.manager'
-      - '@node.grant_storage'
-      - '@permissions_by_term.access_storage'
-      - '@permissions_by_term.node_access'
-
-  # Event subscriber to fix Permissions by Entity caching bypassing access.
-  omnipedia_access.entity_permissions_by_entity_access_cache_event_subscriber:
-    class: Drupal\omnipedia_access\EventSubscriber\Entity\PermissionsByEntityAccessCacheEventSubscriber
-    arguments:
-      - '@permissions_by_entity.access_checker'
-    tags:
-      - { name: 'event_subscriber' }
-
-  # Event subscriber to fix Permissions by Entity bypassing other access checks.
-  omnipedia_access.entity_permissions_by_entity_access_check_event_subscriber:
-    class: Drupal\omnipedia_access\EventSubscriber\Entity\PermissionsByEntityAccessCheckEventSubscriber
-    arguments:
-      - '@permissions_by_entity.access_checker'
-      - '@permissions_by_term.access_result_cache'
-    tags:
-      - { name: 'event_subscriber' }
-
   # Event subscriber to output a 404 not found instead of a 403 access denied.
   omnipedia_access.response_access_denied_to_not_found_event_subscriber:
     class: Drupal\omnipedia_access\EventSubscriber\Response\AccessDeniedToNotFoundEventSubscriber

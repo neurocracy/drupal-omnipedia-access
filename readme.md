@@ -66,3 +66,7 @@ The following major version bumps indicate breaking changes:
   * Requires Drupal 9.5 or [Drupal 10](https://www.drupal.org/project/drupal/releases/10.0.0) with compatibility and deprecation fixes for the latter.
 
   * Increases minimum version of [Hook Event Dispatcher](https://www.drupal.org/project/hook_event_dispatcher) to 3.1, removes deprecated code, and adds support for 4.0 which supports Drupal 10.
+
+* 5.x:
+
+  * Removed all use of the [Permissions by Term module](https://www.drupal.org/project/permissions_by_term), including services, event subscribers, and patches for the module. All of this can still be found in the 4.x and older branches.
