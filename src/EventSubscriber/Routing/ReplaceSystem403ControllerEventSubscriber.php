@@ -28,9 +28,6 @@ class ReplaceSystem403ControllerEventSubscriber extends RouteSubscriberBase {
     }
 
     // Replace the existing controller method with our own.
-    //
-    // @todo Should we check if the Drupal core method has not been replaced by
-    // some other module?
     $route->setDefault(
       '_controller',
       Http4xxController::class . '::on403'
