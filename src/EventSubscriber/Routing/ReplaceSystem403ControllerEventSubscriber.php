@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\omnipedia_access\EventSubscriber\Routing;
 
 use Drupal\Core\Routing\RouteSubscriberBase;
+use Drupal\omnipedia_access\Controller\Http4xxController;
 use Symfony\Component\Routing\RouteCollection;
 
 /**
@@ -32,7 +33,7 @@ class ReplaceSystem403ControllerEventSubscriber extends RouteSubscriberBase {
     // some other module?
     $route->setDefault(
       '_controller',
-      'Drupal\\omnipedia_access\\Controller\\Http4xxController::on403'
+      Http4xxController::class . '::on403'
     );
 
   }
