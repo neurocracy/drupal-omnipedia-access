@@ -6,6 +6,7 @@ namespace Drupal\omnipedia_access\Controller;
 
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
 use Drupal\Core\Link;
+use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\Session\AccountProxyInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -14,14 +15,20 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  */
 class Http4xxController implements ContainerInjectionInterface {
 
+  use StringTranslationTrait;
+
   /**
    * Controller constructor; saves dependencies.
    *
    * @param \Drupal\Core\Session\AccountProxyInterface $currentUser
    *   The current user proxy service.
+   *
+   * @param \Drupal\Core\StringTranslation\TranslationInterface $stringTranslation
+   *   The Drupal string translation service.
    */
   public function __construct(
     protected readonly AccountProxyInterface $currentUser,
+    protected $stringTranslation,
   ) {}
 
   /**
@@ -29,7 +36,8 @@ class Http4xxController implements ContainerInjectionInterface {
    */
   public static function create(ContainerInterface $container) {
     return new static(
-      $container->get('current_user')
+      $container->get('current_user'),
+      $container->get('string_translation'),
     );
   }
 
