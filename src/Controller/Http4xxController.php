@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Drupal\omnipedia_access\Controller;
 
 use Drupal\Core\Cache\CacheableResponse;
-use Drupal\Core\Controller\ControllerBase;
+use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
 use Drupal\Core\Link;
 use Drupal\Core\Session\AccountProxyInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -13,7 +13,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 /**
  * Controller for HTTP 4xx responses.
  */
-class Http4xxController extends ControllerBase {
+class Http4xxController implements ContainerInjectionInterface {
 
   /**
    * Controller constructor; saves dependencies.
@@ -21,9 +21,9 @@ class Http4xxController extends ControllerBase {
    * @param \Drupal\Core\Session\AccountProxyInterface $currentUser
    *   The current user proxy service.
    */
-  public function __construct(AccountProxyInterface $currentUser) {
-    $this->currentUser = $currentUser;
-  }
+  public function __construct(
+    protected readonly AccountProxyInterface $currentUser,
+  ) {}
 
   /**
    * {@inheritdoc}

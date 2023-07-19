@@ -20,6 +20,8 @@ part of this codebase is useful or will inspire someone out there.
 
 * [Drupal 9.5 or 10](https://www.drupal.org/download) ([Drupal 8 is end-of-life](https://www.drupal.org/psa-2021-11-30))
 
+* PHP 8
+
 * [Composer](https://getcomposer.org/)
 
 ----
@@ -70,3 +72,5 @@ The following major version bumps indicate breaking changes:
 * 5.x:
 
   * Removed all use of the [Permissions by Term module](https://www.drupal.org/project/permissions_by_term), including services, event subscribers, and patches for the module. All of this can still be found in the 4.x and older branches.
+
+  * Requires PHP 8.

@@ -19,21 +19,14 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 class AccessDeniedToNotFoundEventSubscriber extends HttpExceptionSubscriberBase {
 
   /**
-   * The current user proxy service.
-   *
-   * @var \Drupal\Core\Session\AccountProxyInterface
-   */
-  protected AccountProxyInterface $currentUser;
-
-  /**
    * Constructs this event subscriber; saves dependencies.
    *
    * @param \Drupal\Core\Session\AccountProxyInterface $currentUser
    *   The current user proxy service.
    */
-  public function __construct(AccountProxyInterface $currentUser) {
-    $this->currentUser = $currentUser;
-  }
+  public function __construct(
+    protected readonly AccountProxyInterface $currentUser,
+  ) {}
 
   /**
    * {@inheritdoc}
