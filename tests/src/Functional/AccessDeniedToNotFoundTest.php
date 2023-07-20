@@ -22,14 +22,14 @@ class AccessDeniedToNotFoundTest extends BrowserTestBase {
    *
    * @var \Drupal\Core\Config\ConfigFactoryInterface
    */
-  protected ConfigFactoryInterface $configFactory;
+  protected readonly ConfigFactoryInterface $configFactory;
 
   /**
    * The Drupal user role entity storage.
    *
    * @var \Drupal\user\RoleStorageInterface
    */
-  protected RoleStorageInterface $roleStorage;
+  protected readonly RoleStorageInterface $roleStorage;
 
   /**
    * {@inheritdoc}
