@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Tests\omnipedia_access\Functional;
 
 use Drupal\Core\Config\ConfigFactoryInterface;
+use Drupal\node\NodeInterface;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\user\RoleInterface;
 use Drupal\user\RoleStorageInterface;
@@ -112,7 +113,7 @@ class AccessDeniedToNotFoundTest extends BrowserTestBase {
     /** @var \Drupal\node\NodeInterface */
     $node = $this->drupalCreateNode([
       'title'   => $this->randomMachineName(8),
-      'status'  => 0,
+      'status'  => NodeInterface::NOT_PUBLISHED,
     ]);
 
     $this->drupalGet($node->toUrl()->toString());
@@ -129,7 +130,7 @@ class AccessDeniedToNotFoundTest extends BrowserTestBase {
     /** @var \Drupal\node\NodeInterface */
     $node = $this->drupalCreateNode([
       'title'   => $this->randomMachineName(8),
-      'status'  => 1,
+      'status'  => NodeInterface::PUBLISHED,
     ]);
 
     $this->drupalGet($node->toUrl()->toString());
