@@ -79,6 +79,47 @@ class AccessDeniedToNotFoundTest extends BrowserTestBase {
   }
 
   /**
+   * Test that anonymous users get 404 not found on various admin routes.
+   */
+  public function testAnonymousAdminNotFound(): void {
+
+    foreach ($this->adminPathsToCheck as $path) {
+
+      $this->drupalGet($path);
+
+      $this->assertSession()->statusCodeEquals(404);
+
+    }
+
+  }
+
+  /**
+   * Test that authenticated users with the bypass permission get 403s.
+   */
+  public function testAuthenticatedAccessDeniedWithBypassPermission(): void {
+
+    /** @var \Drupal\user\RoleInterface */
+    $authenticatedRole = $this->roleStorage->load(
+      RoleInterface::AUTHENTICATED_ID
+    );
+
+    $authenticatedRole->grantPermission(self::BYPASS_NOT_FOUND_PERMISSION);
+
+    $authenticatedRole->trustData()->save();
+
+    $this->drupalLogin($this->createUser([]));
+
+    foreach ($this->adminPathsToCheck as $path) {
+
+      $this->drupalGet($path);
+
+      $this->assertSession()->statusCodeEquals(403);
+
+    }
+
+  }
+
+  /**
    * Test that anonymous users get 403 access denied on the front page.
    */
   public function testAnonymousFrontPageAccessDenied(): void {
@@ -106,21 +147,6 @@ class AccessDeniedToNotFoundTest extends BrowserTestBase {
     $this->drupalGet('');
 
     $this->assertSession()->statusCodeEquals(403);
-
-  }
-
-  /**
-   * Test that anonymous users get 404 not found on various admin routes.
-   */
-  public function testAnonymousAdminNotFound(): void {
-
-    foreach ($this->adminPathsToCheck as $path) {
-
-      $this->drupalGet($path);
-
-      $this->assertSession()->statusCodeEquals(404);
-
-    }
 
   }
 
@@ -162,32 +188,6 @@ class AccessDeniedToNotFoundTest extends BrowserTestBase {
     $this->drupalGet($node->toUrl()->toString());
 
     $this->assertSession()->statusCodeEquals(404);
-
-  }
-
-  /**
-   * Test that authenticated users with the bypass permission get 403s.
-   */
-  public function testAuthenticatedAccessDeniedWithBypassPermission(): void {
-
-    /** @var \Drupal\user\RoleInterface */
-    $authenticatedRole = $this->roleStorage->load(
-      RoleInterface::AUTHENTICATED_ID
-    );
-
-    $authenticatedRole->grantPermission(self::BYPASS_NOT_FOUND_PERMISSION);
-
-    $authenticatedRole->trustData()->save();
-
-    $this->drupalLogin($this->createUser([]));
-
-    foreach ($this->adminPathsToCheck as $path) {
-
-      $this->drupalGet($path);
-
-      $this->assertSession()->statusCodeEquals(403);
-
-    }
 
   }
 
