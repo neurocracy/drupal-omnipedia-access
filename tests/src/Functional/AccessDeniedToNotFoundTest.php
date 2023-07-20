@@ -38,16 +38,8 @@ class AccessDeniedToNotFoundTest extends BrowserTestBase {
 
   /**
    * {@inheritdoc}
-   *
-   * Note that the Views module is required for the Node module to install the
-   * 'frontpage' View, which provides the '/node' path.
-   *
-   * @todo Implement our own simple route for '/node' which requires the
-   *   'access content' permission, and then remove the dependency on Views.
    */
-  protected static $modules = [
-    'node', 'omnipedia_access', 'system', 'user', 'views',
-  ];
+  protected static $modules = ['node', 'omnipedia_access', 'system', 'user'];
 
   /**
    * {@inheritdoc}
@@ -76,10 +68,18 @@ class AccessDeniedToNotFoundTest extends BrowserTestBase {
 
     $anonymousRole->trustData()->save();
 
+    $this->drupalCreateContentType(['type' => 'page']);
+
+    /** @var \Drupal\node\NodeInterface */
+    $node = $this->drupalCreateNode([
+      'title'   => $this->randomMachineName(8),
+      'status'  => NodeInterface::PUBLISHED,
+    ]);
+
     /** @var \Drupal\Core\Config\Config */
     $config = $this->configFactory->getEditable('system.site');
 
-    $config->set('page.front', '/node')->save();
+    $config->set('page.front', $node->toUrl()->toString())->save();
 
     $this->drupalGet('');
 
