@@ -42,6 +42,23 @@ class AccessDeniedToNotFoundTest extends BrowserTestBase {
   protected static $modules = ['node', 'omnipedia_access', 'system', 'user'];
 
   /**
+   * Various admin paths to check for 404s or 403s, depending on the user.
+   *
+   * @var string[]
+   */
+  protected array $adminPathsToCheck = [
+    'admin',
+    'admin/content',
+    'admin/structure',
+    'admin/appearance',
+    'admin/modules',
+    'admin/config/people/accounts',
+    'admin/config/system/site-information',
+    'admin/reports',
+    'admin/reports/status/php',
+  ];
+
+  /**
    * {@inheritdoc}
    */
   protected function setUp(): void {
@@ -92,9 +109,13 @@ class AccessDeniedToNotFoundTest extends BrowserTestBase {
    */
   public function testAnonymousAdminNotFound(): void {
 
-    $this->drupalGet('admin');
+    foreach ($this->adminPathsToCheck as $path) {
 
-    $this->assertSession()->statusCodeEquals(404);
+      $this->drupalGet($path);
+
+      $this->assertSession()->statusCodeEquals(404);
+
+    }
 
   }
 
@@ -155,9 +176,13 @@ class AccessDeniedToNotFoundTest extends BrowserTestBase {
 
     $this->drupalLogin($this->createUser([]));
 
-    $this->drupalGet('admin');
+    foreach ($this->adminPathsToCheck as $path) {
 
-    $this->assertSession()->statusCodeEquals(403);
+      $this->drupalGet($path);
+
+      $this->assertSession()->statusCodeEquals(403);
+
+    }
 
   }
 
