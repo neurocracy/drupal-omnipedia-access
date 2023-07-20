@@ -21,7 +21,7 @@ class AccessDeniedToNotFoundEventSubscriber extends HttpExceptionSubscriberBase 
   /**
    * The name of the permission a role must have to see 403s instead of 404s.
    */
-  protected const BYPASS_NOT_FOUND_PERMISSION = 'bypass node access';
+  protected const BYPASS_NOT_FOUND_PERMISSION = 'omnipedia_access bypass not found';
 
   /**
    * Constructs this event subscriber; saves dependencies.

@@ -1,0 +1,3 @@
+'omnipedia_access bypass not found':
+  title: 'View access denied errors'
+  description: 'Whether a user can see "access denied" errors. Users without this permission will see "not found" errors for paths that exist but that they don''t have access to.'
