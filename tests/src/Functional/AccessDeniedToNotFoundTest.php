@@ -139,4 +139,26 @@ class AccessDeniedToNotFoundTest extends BrowserTestBase {
 
   }
 
+  /**
+   * Test that authenticated users with 'bypass node access' get 403s.
+   */
+  public function testAuthenticatedAccessDeniedWithBypassPermission(): void {
+
+    /** @var \Drupal\user\RoleInterface */
+    $authenticatedRole = $this->roleStorage->load(
+      RoleInterface::AUTHENTICATED_ID
+    );
+
+    $authenticatedRole->grantPermission('bypass node access');
+
+    $authenticatedRole->trustData()->save();
+
+    $this->drupalLogin($this->createUser([]));
+
+    $this->drupalGet('admin');
+
+    $this->assertSession()->statusCodeEquals(403);
+
+  }
+
 }
