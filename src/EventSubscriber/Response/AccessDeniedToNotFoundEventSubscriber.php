@@ -19,6 +19,11 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 class AccessDeniedToNotFoundEventSubscriber extends HttpExceptionSubscriberBase {
 
   /**
+   * The name of the permission a role must have to see 403s instead of 404s.
+   */
+  protected const BYPASS_NOT_FOUND_PERMISSION = 'bypass node access';
+
+  /**
    * Constructs this event subscriber; saves dependencies.
    *
    * @param \Drupal\Core\Session\AccountProxyInterface $currentUser
@@ -46,7 +51,7 @@ class AccessDeniedToNotFoundEventSubscriber extends HttpExceptionSubscriberBase 
    */
   public function on403(ExceptionEvent $event): void {
 
-    if ($this->currentUser->hasPermission('bypass node access')) {
+    if ($this->currentUser->hasPermission(self::BYPASS_NOT_FOUND_PERMISSION)) {
 
       $event->setThrowable(new AccessDeniedHttpException());
 
