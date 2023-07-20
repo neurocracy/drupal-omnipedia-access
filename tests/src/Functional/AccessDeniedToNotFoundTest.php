@@ -59,6 +59,11 @@ class AccessDeniedToNotFoundTest extends BrowserTestBase {
   ];
 
   /**
+   * The name of the permission a role must have to see 403s instead of 404s.
+   */
+  protected const BYPASS_NOT_FOUND_PERMISSION = 'bypass node access';
+
+  /**
    * {@inheritdoc}
    */
   protected function setUp(): void {
@@ -161,7 +166,7 @@ class AccessDeniedToNotFoundTest extends BrowserTestBase {
   }
 
   /**
-   * Test that authenticated users with 'bypass node access' get 403s.
+   * Test that authenticated users with the bypass permission get 403s.
    */
   public function testAuthenticatedAccessDeniedWithBypassPermission(): void {
 
@@ -170,7 +175,7 @@ class AccessDeniedToNotFoundTest extends BrowserTestBase {
       RoleInterface::AUTHENTICATED_ID
     );
 
-    $authenticatedRole->grantPermission('bypass node access');
+    $authenticatedRole->grantPermission(self::BYPASS_NOT_FOUND_PERMISSION);
 
     $authenticatedRole->trustData()->save();
 
