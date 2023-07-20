@@ -44,7 +44,9 @@ class AccessDeniedToNotFoundTest extends BrowserTestBase {
    * @todo Implement our own simple route for '/node' which requires the
    *   'access content' permission, and then remove the dependency on Views.
    */
-  protected static $modules = ['node', 'omnipedia_access', 'system', 'views'];
+  protected static $modules = [
+    'node', 'omnipedia_access', 'system', 'user', 'views',
+  ];
 
   /**
    * {@inheritdoc}
