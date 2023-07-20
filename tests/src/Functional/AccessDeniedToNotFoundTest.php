@@ -94,6 +94,23 @@ class AccessDeniedToNotFoundTest extends BrowserTestBase {
   }
 
   /**
+   * Test that authenticated users get 404 not found on various admin routes.
+   */
+  public function testAuthenticatedAdminNotFound(): void {
+
+    $this->drupalLogin($this->createUser([]));
+
+    foreach ($this->adminPathsToCheck as $path) {
+
+      $this->drupalGet($path);
+
+      $this->assertSession()->statusCodeEquals(404);
+
+    }
+
+  }
+
+  /**
    * Test that authenticated users with the bypass permission get 403s.
    */
   public function testAuthenticatedAccessDeniedWithBypassPermission(): void {
