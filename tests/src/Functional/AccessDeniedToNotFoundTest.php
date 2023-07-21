@@ -13,6 +13,8 @@ use Drupal\user\RoleStorageInterface;
 /**
  * Tests for the Omnipedia access denied to not found response functionality.
  *
+ * @group omnipedia
+ *
  * @group omnipedia_access
  *
  * @see \Drupal\Tests\system\Functional\System\AccessDeniedTest
