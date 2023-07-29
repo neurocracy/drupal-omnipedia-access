@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Tests\omnipedia_access\Functional;
 
 use Drupal\Core\Config\ConfigFactoryInterface;
+use Drupal\Core\Url;
 use Drupal\node\NodeInterface;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\user\RoleInterface;
@@ -50,20 +51,36 @@ class AccessDeniedToNotFoundTest extends BrowserTestBase {
   protected static $modules = ['node', 'omnipedia_access', 'system', 'user'];
 
   /**
-   * Various admin paths to check for 404s or 403s, depending on the user.
+   * Array of Url objects to check, keyed by their route name.
+   *
+   * @var \Drupal\Core\Url[]
+   */
+  protected array $adminUrlsToCheck = [];
+
+  /**
+   * Various admin routes to check for 404s or 403s, depending on the user.
    *
    * @var string[]
    */
-  protected array $adminPathsToCheck = [
-    'admin',
-    'admin/content',
-    'admin/structure',
-    'admin/appearance',
-    'admin/modules',
-    'admin/config/people/accounts',
-    'admin/config/system/site-information',
-    'admin/reports',
-    'admin/reports/status/php',
+  protected array $adminRoutesToCheck = [
+    // Path: 'admin'
+    'system.admin',
+    // Path: 'admin/content'
+    'system.admin_content',
+    // Path: 'admin/structure'
+    'system.admin_structure',
+    // Path: 'admin/appearance'
+    'system.themes_page',
+    // Path: 'admin/modules'
+    'system.modules_list',
+    // Path: 'admin/config/people/accounts'
+    'entity.user.admin_form',
+    // Path: 'admin/config/system/site-information'
+    'system.site_information_settings',
+    // Path: 'admin/reports'
+    'system.admin_reports',
+    // Path: 'admin/reports/status/php'
+    'system.php',
   ];
 
   /**
@@ -84,6 +101,12 @@ class AccessDeniedToNotFoundTest extends BrowserTestBase {
       'entity_type.manager'
     )->getStorage('user_role');
 
+    foreach ($this->adminRoutesToCheck as $routeName) {
+
+      $this->adminUrlsToCheck[$routeName] = Url::fromRoute($routeName);
+
+    }
+
   }
 
   /**
@@ -91,7 +114,7 @@ class AccessDeniedToNotFoundTest extends BrowserTestBase {
    */
   public function testAnonymousAdminNotFound(): void {
 
-    foreach ($this->adminPathsToCheck as $path) {
+    foreach ($this->adminUrlsToCheck as $path) {
 
       $this->drupalGet($path);
 
@@ -108,7 +131,7 @@ class AccessDeniedToNotFoundTest extends BrowserTestBase {
 
     $this->drupalLogin($this->createUser([]));
 
-    foreach ($this->adminPathsToCheck as $path) {
+    foreach ($this->adminUrlsToCheck as $path) {
 
       $this->drupalGet($path);
 
@@ -134,7 +157,7 @@ class AccessDeniedToNotFoundTest extends BrowserTestBase {
 
     $this->drupalLogin($this->createUser([]));
 
-    foreach ($this->adminPathsToCheck as $path) {
+    foreach ($this->adminUrlsToCheck as $path) {
 
       $this->drupalGet($path);
 
