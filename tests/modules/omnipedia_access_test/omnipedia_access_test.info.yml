@@ -1,0 +1,9 @@
+name: Omnipedia - Access - Test module
+type: module
+description: Support module for testing the Omnipedia - Access module.
+package: Testing
+core_version_requirement: ^9.5 || ^10.0
+php: 8.1
+
+dependencies:
+  - omnipedia_access:omnipedia_access

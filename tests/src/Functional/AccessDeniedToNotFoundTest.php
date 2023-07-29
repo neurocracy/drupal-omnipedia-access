@@ -84,6 +84,25 @@ class AccessDeniedToNotFoundTest extends BrowserTestBase {
   ];
 
   /**
+   * Various admin routes to expose 403s for testing our event.
+   *
+   * @var string[]
+   *
+   * @see \Drupal\omnipedia_access_test\EventSubscriber\Omnipedia\AccessDeniedToNotFoundEventSubscriber::$adminRoutesToExpose
+   *   Must match this list.
+   */
+  protected array $adminRoutesToExpose = [
+    // Path: 'admin/content'
+    'system.admin_content',
+    // Path: 'admin/structure'
+    'system.admin_structure',
+    // Path: 'admin/appearance'
+    'system.themes_page',
+    // Path: 'admin/modules'
+    'system.modules_list',
+  ];
+
+  /**
    * The name of the permission a role must have to see 403s instead of 404s.
    */
   protected const BYPASS_NOT_FOUND_PERMISSION = 'omnipedia_access bypass not found';
@@ -236,6 +255,41 @@ class AccessDeniedToNotFoundTest extends BrowserTestBase {
     $this->drupalGet($node->toUrl()->toString());
 
     $this->assertSession()->statusCodeEquals(404);
+
+  }
+
+  /**
+   * Test that our event correctly allows exposing 403s.
+   */
+  public function testEvent(): void {
+
+    /** @var \Drupal\Core\Extension\ModuleInstallerInterface */
+    $moduleInstaller = $this->container->get('module_installer');
+
+    // Install the test module which provides an event subscriber that exposes
+    // a series of admin routes as 403s.
+    $moduleInstaller->install([
+      'omnipedia_access_test',
+    ]);
+
+    foreach ($this->adminRoutesToExpose as $routeName) {
+
+      $this->drupalGet($this->adminUrlsToCheck[$routeName]);
+
+      $this->assertSession()->statusCodeEquals(403);
+
+    }
+
+    // Check the other admin routes to verify that they still result in a 404.
+    foreach (\array_diff(
+      $this->adminRoutesToCheck, $this->adminRoutesToExpose,
+    ) as $routeName) {
+
+      $this->drupalGet($this->adminUrlsToCheck[$routeName]);
+
+      $this->assertSession()->statusCodeEquals(404);
+
+    }
 
   }
 

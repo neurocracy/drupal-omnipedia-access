@@ -6,6 +6,9 @@ namespace Drupal\omnipedia_access\EventSubscriber\Response;
 
 use Drupal\Core\EventSubscriber\HttpExceptionSubscriberBase;
 use Drupal\Core\Session\AccountProxyInterface;
+use Drupal\omnipedia_access\Event\Omnipedia\AccessDeniedToNotFoundEvent;
+use Drupal\omnipedia_access\Event\Omnipedia\AccessDeniedToNotFoundEventsInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -28,9 +31,13 @@ class AccessDeniedToNotFoundEventSubscriber extends HttpExceptionSubscriberBase 
    *
    * @param \Drupal\Core\Session\AccountProxyInterface $currentUser
    *   The current user proxy service.
+   *
+   * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface $eventDispatcher
+   *   The Symfony event dispatcher service.
    */
   public function __construct(
-    protected readonly AccountProxyInterface $currentUser,
+    protected readonly AccountProxyInterface    $currentUser,
+    protected readonly EventDispatcherInterface $eventDispatcher,
   ) {}
 
   /**
@@ -68,9 +75,28 @@ class AccessDeniedToNotFoundEventSubscriber extends HttpExceptionSubscriberBase 
     // match both when the base path ('/') is accessed and when the default
     // front page path is accessed (e.g. '/node/\d+' or the node's path alias);
     // i.e. it doesn't make a distinction between the actual paths.
-    if ($request->getPathInfo() !== '/') {
-      $event->setThrowable(new NotFoundHttpException());
+    if ($request->getPathInfo() === '/') {
+      return;
     }
+
+    /** @var \Drupal\omnipedia_access\Event\Omnipedia\AccessDeniedToNotFoundEvent */
+    $dispatchedEvent = new AccessDeniedToNotFoundEvent($request);
+
+    $this->eventDispatcher->dispatch(
+      $dispatchedEvent,
+      AccessDeniedToNotFoundEventsInterface::ACCESS_DENIED_TO_NOT_FOUND,
+    );
+
+    if ($dispatchedEvent->hasThrowable() === true) {
+
+      $event->setThrowable($dispatchedEvent->getThrowable());
+
+      return;
+
+    }
+
+    // If no throwable was provided, set it as not found.
+    $event->setThrowable(new NotFoundHttpException());
 
   }
 

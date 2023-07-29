@@ -5,6 +5,7 @@ services:
     class: Drupal\omnipedia_access\EventSubscriber\Response\AccessDeniedToNotFoundEventSubscriber
     arguments:
       - '@current_user'
+      - '@event_dispatcher'
     tags:
       - { name: 'event_subscriber' }
 

@@ -1,0 +1,8 @@
+services:
+
+  omnipedia_access_test.access_denied_to_not_found_event_subscriber:
+    class: Drupal\omnipedia_access_test\EventSubscriber\Omnipedia\AccessDeniedToNotFoundEventSubscriber
+    arguments:
+      - '@current_route_match'
+    tags:
+      - { name: 'event_subscriber' }
