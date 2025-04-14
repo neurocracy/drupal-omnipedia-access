@@ -35,9 +35,10 @@ should get you up and running.
 In your root `composer.json`, add the following to the `"repositories"` section:
 
 ```json
-"drupal/omnipedia_access": {
+{
   "type": "vcs",
-  "url": "https://github.com/neurocracy/drupal-omnipedia-access.git"
+  "url": "https://gitlab.com/neurocracy/omnipedia/modules/omnipedia-access.git",
+  "only": ["drupal/omnipedia_access"]
 }
 ```
 
