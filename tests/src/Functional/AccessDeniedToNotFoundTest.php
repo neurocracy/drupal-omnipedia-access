@@ -10,13 +10,11 @@ use Drupal\Core\Url;
 use Drupal\node\NodeInterface;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\user\RoleInterface;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests for the Omnipedia access denied to not found response functionality.
- *
- * @group omnipedia
- *
- * @group omnipedia_access
  *
  * @see \Drupal\Tests\system\Functional\System\AccessDeniedTest
  *
@@ -24,6 +22,9 @@ use Drupal\user\RoleInterface;
  *
  * @see \Drupal\Tests\system\Functional\System\PageNotFoundTest
  */
+#[Group('omnipedia')]
+#[Group('omnipedia_access')]
+#[RunTestsInSeparateProcesses]
 class AccessDeniedToNotFoundTest extends BrowserTestBase {
 
   /**
